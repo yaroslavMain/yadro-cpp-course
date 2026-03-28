@@ -1,25 +1,40 @@
 #include "bitset.h"
 
 
-size_t bitset::current_block_size() const {
-    return (bits_count + 63) / 64;
+size_t bitset::words_for_bits(const size_t bits) noexcept {
+    return (bits + bits_per_word - 1) / bits_per_word;
 }
 
+size_t bitset::block_index(const size_t pos) noexcept {
+    return pos / bits_per_word;
+}
+
+size_t bitset::bit_mask(const size_t pos) noexcept {
+    return 1ULL << (pos % bits_per_word);
+}
+
+
+size_t bitset::word_capacity_count() const noexcept {
+    return words_for_bits(capacity_);
+}
+
+
 void bitset::resize(const size_t new_size) {
-    const size_t old_words = current_block_size();
-    const size_t new_words = (new_size + 63) / 64;
+    if (new_size <= capacity_) return;
 
-    auto *new_data = new uint64_t[new_words]();
+    const size_t old_words = word_capacity_count();
+    const size_t new_words = words_for_bits(new_size);
 
-    assert(new_data != nullptr);
+    auto *new_data = new(std::nothrow) uint64_t[new_words]();
+    if (!new_data) return;;
 
-    if (data != nullptr) {
-        std::memcpy(new_data, data, sizeof(uint64_t) * std::min(old_words, new_words));
-        delete[] data;
+    if (data_ && old_words > 0) {
+        std::memcpy(new_data, data_, old_words * bytes_per_word);
     }
 
-    data = new_data;
-    bits_count = new_words * 64;
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_words * bits_per_word;
 }
 
 bitset::bitset() = default;
@@ -30,68 +45,73 @@ bitset::bitset(const size_t initial_capacity) {
 }
 
 bitset::~bitset() {
-    delete[] data;
+    delete[] data_;
 }
 
-bitset::bitset(const bitset &other) : bits_count(other.bits_count) {
-    const size_t words = current_block_size();
-    if (words > 0 && other.data != nullptr) {
-        data = new uint64_t[words];
-        assert(data != nullptr);
-        std::memcpy(data, other.data, sizeof(uint64_t) * words);
+bitset::bitset(const bitset &other) : capacity_(other.capacity_) {
+    const size_t other_words = words_for_bits(other.capacity_);
+    if (other_words > 0) {
+        data_ = new uint64_t[other_words]();
+        std::memcpy(data_, other.data_, other_words * bytes_per_word);
     } else {
-        data = nullptr;
+        data_ = nullptr;
     }
 }
 
 bitset &bitset::operator=(const bitset &other) {
     if (this == &other) return *this;
 
-    delete[] data;
-    data = nullptr;
+    delete[] data_;
 
-    bits_count = other.bits_count;
-    const size_t words = current_block_size();
-    if (words > 0 && other.data != nullptr) {
-        data = new uint64_t[words];
-        assert(data != nullptr);
-        std::memcpy(data, other.data, sizeof(uint64_t) * words);
+    data_ = nullptr;
+    capacity_ = other.capacity_;
+
+    const size_t other_words = words_for_bits(other.capacity_);
+    if (other_words > 0) {
+        data_ = new uint64_t[other_words]();
+        std::memcpy(data_, other.data_, other_words * bytes_per_word);
     }
 
     return *this;
 }
 
-bitset::bitset(bitset &&other) noexcept : data(other.data), bits_count(other.bits_count) {
-    other.data = nullptr;
-    other.bits_count = 0;
+bitset::bitset(bitset &&other) noexcept : data_(other.data_), capacity_(other.capacity_) {
+    other.data_ = nullptr;
+    other.capacity_ = 0;
 }
 
 bitset &bitset::operator=(bitset &&other) noexcept {
     if (this == &other) return *this;
-    delete[] data;
 
-    bits_count = other.bits_count;
-    data = other.data;
+    delete[] data_;
 
-    other.data = nullptr;
-    other.bits_count = 0;
+    data_ = other.data_;
+    capacity_ = other.capacity_;
+
+    other.data_ = nullptr;
+    other.capacity_ = 0;
 
     return *this;
 }
 
 void bitset::set(const size_t k, const bool b) {
+    const size_t block = block_index(k);
+    const size_t mask = bit_mask(k);
+
     if (b) {
-        if (k >= bits_count)
-            resize(std::max(k + 1, bits_count * 2));
-        data[k / 64] |= (1ull << (k % 64));
-    } else if (k < bits_count) {
-        data[k / 64] &= ~(1ull << (k % 64));
+        if (k >= capacity_)
+            resize(std::max(k + 1, capacity_ * 2));
+
+        if (!data_) return;
+        data_[block] |= mask;
+    } else if (k < capacity_ && data_) {
+        data_[block] &= ~mask;
     }
 }
 
 bool bitset::test(const size_t k) const {
-    if (k >= bits_count) return false;
-    return data[k / 64] & (1ull << (k % 64));
+    if (!data_ && k >= capacity_) return false;
+    return data_[block_index(k)] & bit_mask(k);
 }
 
 bool bitset::operator[](const size_t k) const {
@@ -99,55 +119,61 @@ bool bitset::operator[](const size_t k) const {
 }
 
 size_t bitset::size() const {
-    return bits_count;
+    return capacity_;
 }
 
 bool bitset::empty() const {
-    const size_t words = current_block_size();
-    for (size_t i = 0; i < words; ++i) if (data[i] != 0) return false;
+    if (!data_) return true;
+
+    const size_t words = word_capacity_count();
+    for (size_t i = 0; i < words; ++i)
+        if (data_[i] != 0)
+            return false;
+
     return true;
 }
 
-void bitset::clear() const {
-    if (data) std::memset(data, 0, current_block_size() * sizeof(uint64_t));
+void bitset::clear() noexcept {
+    if (data_)
+        std::memset(data_, 0, word_capacity_count() * bytes_per_word);
 }
 
 bitset bitset::union_with(const bitset &other) const {
-    bitset result(std::max(bits_count, other.bits_count));
+    bitset result(std::max(capacity_, other.capacity_));
 
-    const size_t min_w = std::min(current_block_size(), other.current_block_size());
-    const size_t max_w = result.current_block_size();
+    const size_t min_w = std::min(word_capacity_count(), other.word_capacity_count());
+    const size_t max_w = result.word_capacity_count();
 
     for (size_t i = 0; i < min_w; ++i)
-        result.data[i] = data[i] | other.data[i];
+        result.data_[i] = data_[i] | other.data_[i];
 
-    const uint64_t *longer = current_block_size() == max_w ? data : other.data;
+    const uint64_t *longer = (word_capacity_count() >= other.word_capacity_count()) ? data_ : other.data_;
     for (size_t i = min_w; i < max_w; ++i)
-        result.data[i] = longer[i];
+        result.data_[i] = longer[i];
+
 
     return result;
 }
 
 bitset bitset::intersection(const bitset &other) const {
-    const size_t min_b = std::min(current_block_size(), other.current_block_size());
-    assert(min_b > 0);
+    const size_t min_word_count = std::min(word_capacity_count(), other.word_capacity_count());
 
-    bitset result(min_b * 64);
-    for (size_t i = 0; i < min_b; ++i)
-        result.data[i] = data[i] & other.data[i];
+    bitset result(min_word_count * bits_per_word);
+    for (size_t i = 0; i < min_word_count; ++i)
+        result.data_[i] = data_[i] & other.data_[i];
 
     return result;
 }
 
 bool bitset::is_subset(const bitset &other) const {
-    const size_t curr_w = current_block_size();
-    const size_t other_w = other.current_block_size();
+    const size_t curr_word_count = word_capacity_count();
+    const size_t other_word_count = other.word_capacity_count();
 
-    for (size_t i = 0; i < curr_w; ++i) {
-        uint64_t curr_word = data[i];
-        uint64_t other_word = (i < other_w) ? other.data[i] : 0;
+    for (size_t i = 0; i < curr_word_count; ++i) {
+        const uint64_t curr_word = data_[i];
 
-        if ((curr_word & other_word) != curr_word)
+        if (const uint64_t other_word = (i < other_word_count) ? other.data_[i] : 0;
+            (curr_word & other_word) != curr_word)
             return false;
     }
 

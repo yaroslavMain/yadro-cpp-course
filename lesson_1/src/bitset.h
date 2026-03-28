@@ -2,10 +2,17 @@
 #include <algorithm>
 
 class bitset {
-    uint64_t *data = nullptr;
-    size_t bits_count = 0;
+    static constexpr size_t bytes_per_word = sizeof(uint64_t);
+    static constexpr size_t bits_per_word = bytes_per_word * 8;
 
-    [[nodiscard]] size_t current_block_size() const;
+    uint64_t *data_ = nullptr;
+    size_t capacity_ = 0; // in bits
+
+    [[nodiscard]] static size_t words_for_bits(size_t bits) noexcept;
+    [[nodiscard]] static size_t block_index(size_t pos) noexcept;
+    [[nodiscard]] static size_t bit_mask(size_t pos) noexcept;
+    [[nodiscard]] size_t word_capacity_count() const noexcept;
+
     void resize(size_t new_size);
 
 public:
@@ -25,7 +32,7 @@ public:
 
     [[nodiscard]] size_t size() const;
     [[nodiscard]] bool empty() const;
-    void clear() const;
+    void clear() noexcept;
 
     [[nodiscard]] bitset union_with(const bitset &other) const;
     [[nodiscard]] bitset intersection(const bitset &other) const;

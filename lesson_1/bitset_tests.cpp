@@ -5,8 +5,11 @@ TEST(BitsetTests, Constructors) {
     const bitset bs1;
     EXPECT_TRUE(bs1.empty());
 
-    const bitset bs2(100);
-    EXPECT_TRUE(bs2.size() == 64 * 2);
+    bitset bs2(100);
+    EXPECT_TRUE(bs2.empty());
+
+    bs2.set(12, true);
+    EXPECT_EQ(bs2.size(), 64 * 2);
 }
 
 
@@ -58,7 +61,7 @@ TEST(BitsetTests, MoveConstructor) {
 
     EXPECT_EQ(bs2.size(), 64);
     EXPECT_TRUE(bs2.test(5));
-    EXPECT_EQ(bs1.size(), 0);
+    EXPECT_TRUE(bs1.empty());
     EXPECT_FALSE(bs2.test(10));
 }
 
@@ -115,7 +118,7 @@ TEST(BitsetTests, UnionWithDifferentSizes) {
     big.set(100, true);
 
     const bitset res1 = small.union_with(big);
-    EXPECT_EQ(res1.size(), 128);
+    EXPECT_EQ(res1.size(), 64 * 2);
     EXPECT_TRUE(res1.test(10));
     EXPECT_TRUE(res1.test(100));
 
