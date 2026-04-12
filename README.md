@@ -8,6 +8,11 @@ This repository contains homework assignments for the **YADRO C++ Development Co
   intersection, subset), and support for Move Semantics.
 * **Week 2: buffering_writer** - Implementation of a thread-safe, asynchronous file writer using the Pimpl pattern and a
   background worker thread. It utilizes std::condition_variable to efficiently handle buffered I/O operations
+* **Week 3:**
+    * **Log call** - A compile-time utility that logs function names to std::cout if they match a predefined interesting list.
+    * **User-literal _rpn** - A custom literal that parses and evaluates Reverse Polish Notation expressions into integers at compile time.
+    * **User-literal _ti** - A recursive-descent parser that converts a string literal (using < | > syntax) into a dynamic binary tree of integers.
+    * **User-literal _vi** - An easy-to-use literal that parses a delimited string (e.g., "1,2;3.4") and returns a std::vector<int>
 
 ## ⚠️ Important: Git Submodules
 
