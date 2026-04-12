@@ -4,7 +4,10 @@ This repository contains homework assignments for the **YADRO C++ Development Co
 
 ## 📌 Projects
 
-* **Lesson 1: bitset** - Implementation of a dynamic bitset with automatic resizing, theory operations (union, intersection, subset), and support for Move Semantics.
+* **Week 1: bitset** - Implementation of a dynamic bitset with automatic resizing, theory operations (union,
+  intersection, subset), and support for Move Semantics.
+* **Week 2: buffering_writer** - Implementation of a thread-safe, asynchronous file writer using the Pimpl pattern and a
+  background worker thread. It utilizes std::condition_variable to efficiently handle buffered I/O operations
 
 ## ⚠️ Important: Git Submodules
 

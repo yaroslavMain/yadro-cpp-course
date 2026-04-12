@@ -7,5 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Google Tests
 add_subdirectory(tasks/contrib/googletest)
 
-# lesson_1
-add_subdirectory(lesson_1)
+# Weeks
+add_subdirectory(week_1)
+add_subdirectory(week_2)
