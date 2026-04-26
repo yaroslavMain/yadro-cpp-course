@@ -13,6 +13,7 @@ This repository contains homework assignments for the **YADRO C++ Development Co
     * **User-literal _rpn** - A custom literal that parses and evaluates Reverse Polish Notation expressions into integers at compile time.
     * **User-literal _ti** - A recursive-descent parser that converts a string literal (using < | > syntax) into a dynamic binary tree of integers.
     * **User-literal _vi** - An easy-to-use literal that parses a delimited string (e.g., "1,2;3.4") and returns a std::vector<int>
+* **Week 4**: A custom implementation of a std::tuple-like container using variadic templates and recursive inheritance.
 
 ## ⚠️ Important: Git Submodules
 
