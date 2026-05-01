@@ -19,9 +19,9 @@ This repository contains homework assignments for the **YADRO C++ Development Co
       vector<int>
 * **Week 4**: A custom implementation of a std::tuple-like container using variadic templates and recursive inheritance.
 * **Week 5**:
-    * Meta computer: A compile-time utility that evaluates expressions during compilation using template
+    * **Meta computer**: A compile-time utility that evaluates expressions during compilation using template
       metaprogramming.
-    * Smart sort: A practical example of metaprogramming that selects the most efficient sorting algorithm at compile
+    * **Smart sort**: A practical example of metaprogramming that selects the most efficient sorting algorithm at compile
       time based on the object type.
 
 ## ⚠️ Important: Git Submodules
