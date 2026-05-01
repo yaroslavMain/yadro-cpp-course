@@ -17,7 +17,7 @@ This repository contains homework assignments for the **YADRO C++ Development Co
       dynamic binary tree of integers.
     * **User-literal _vi** - An easy-to-use literal that parses a delimited string (e.g., "1,2;3.4") and returns a std::
       vector<int>
-* **Week 4**: A custom implementation of a std::tuple-like container using variadic templates and recursive inheritance.
+* **Week 4**: **tuple** - A custom implementation of a std::tuple-like container using variadic templates and recursive inheritance.
 * **Week 5**:
     * **Meta computer**: A compile-time utility that evaluates expressions during compilation using template
       metaprogramming.
