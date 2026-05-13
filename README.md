@@ -18,11 +18,15 @@ This repository contains homework assignments for the **YADRO C++ Development Co
     * **User-literal _vi** - An easy-to-use literal that parses a delimited string (e.g., "1,2;3.4") and returns a std::
       vector<int>
 * **Week 4**: **tuple** - A custom implementation of a std::tuple-like container using variadic templates and recursive inheritance.
-* **Week 5**:
-    * **Meta computer**: A compile-time utility that evaluates expressions during compilation using template
+* **Week 5 and 6**:
+    * **Meta computer** - A compile-time utility that evaluates expressions during compilation using template
       metaprogramming.
-    * **Smart sort**: A practical example of metaprogramming that selects the most efficient sorting algorithm at compile
+    * **Smart sort** - A practical example of metaprogramming that selects the most efficient sorting algorithm at compile
       time based on the object type.
+* **Week 7**:
+    * **Action Store** - A robust, lightweight implementation of a move-only callable wrapper designed to decoupling event systems and pipeline architectures without classical OOP inheritance overhead.
+    * **std::function Replica** - A modern C++ type-erased wrapper for callable entities.
+    * **Serialization Wrapper** - A generic type-erased wrapper that provides a unified `serialize` interface for any custom user types.
 
 ## ⚠️ Important: Git Submodules
 
