@@ -27,6 +27,9 @@ This repository contains homework assignments for the **YADRO C++ Development Co
     * **Action Store** - A robust, lightweight implementation of a move-only callable wrapper designed to decoupling event systems and pipeline architectures without classical OOP inheritance overhead.
     * **std::function Replica** - A modern C++ type-erased wrapper for callable entities.
     * **Serialization Wrapper** - A generic type-erased wrapper that provides a unified `serialize` interface for any custom user types.
+* **Week 8**:
+    * **Basic Example** - C++ template-based thread pool utilizing a synchronized queue and condition variables for concurrent task execution.
+    * **Shared Data System** - A thread-safe data container powered by a custom write-preferred reader-writer mutex to prioritize updates over lookups.
 
 ## ⚠️ Important: Git Submodules
 
