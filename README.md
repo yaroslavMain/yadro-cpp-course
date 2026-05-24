@@ -45,6 +45,9 @@ This repository contains homework assignments for the **YADRO C++ Development Co
       conditional timed waits to trigger repetitive callbacks.
     * **Read-Write Lock** - A custom shared-exclusive synchronization primitive with custom RAII guards designed to
       prevent reader starvation by prioritizing pending writer threads.
+* *Week 10*:
+    * **Ring buffer**: - A lock-free, thread-safe circular buffer requiring a power-of-two capacity that utilizes atomic index masking for efficient push and pop operations.
+    * **Concurrent bag** - A multi-producer container using atomic flag arrays and index reservations to provide thread-safe, non-blocking element insertion and retrieval.
 
 ## ⚠️ Important: Git Submodules
 
